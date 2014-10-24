@@ -141,8 +141,8 @@ function showResults(spins)
             reel_images[index].regX = reel_images[index].image.width / 2;
             reel_images[index].regY = reel_images[index].image.height / 2;
             reel_images[index].x = reel_start_x + (i * x_offset);
-            reel_images[index].y = reel_start_y + (x * y_offset);                
-            stage.addChild(reel_images[index]);              
+            reel_images[index].y = reel_start_y + (count * y_offset);                
+            stage.addChild(reel_images[index]);                          
             index++;
         }
     }   
