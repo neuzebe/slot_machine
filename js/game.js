@@ -3,8 +3,21 @@ var queue;
 var game;
 var outcome;
 
-var blastoise_img, rattata_img, mewtwo_img, mew_img, charizard_img, pidgey_img;
-var reels = [];
+var reels = [
+    ['blastoise', 'mew', 'pidgey', 'rattata', 'charizard', 'mewtwo'],
+    ['mew', 'rattata', 'blastoise', 'mewtwo', 'pidgey', 'charizard'],
+    ['charizard', 'mewtwo', 'mew', 'blastoise', 'rattata', 'pidgey'],
+    ['rattata', 'charizard', 'blastoise', 'mew', 'pidgey', 'mewtwo'],
+    ['mewtwo', 'blastoise', 'mew', 'pidgey', 'charizard', 'rattata']
+];
+
+var reel_images = [];
+    
+ var y_offset = 110;  
+ var reel_start_y = 100;
+ 
+ var x_offset = 115;
+ var reel_start_x = 170;
     
 function showStats()
 {
@@ -20,7 +33,7 @@ function showStats()
 }
 
 function spin()
-{
+{    
     game.bet = $("#place_bet").val();
 
     if(game.bet > game.player_money)        
@@ -29,6 +42,7 @@ function spin()
         alert("You need to specify a valid bet amount");        
     else
     {
+        clearReel();
         outcome.reset();
         game.winnings = 0;
         game.player_money -= game.bet;
@@ -39,49 +53,37 @@ function spin()
 
         for(var i = 0; i < 5; i++)
         {
-            spins[i] = Math.floor((Math.random() * 100) + 1);
-
-            switch(spins[i])
+            spins[i] = Math.floor((Math.random() * 6));                        
+            result[i] = reels[i][spins[i]];   
+            
+            if(result[i] === "blastoise")
             {
-                case checkRange(spins[i], 1, 40):
-                    result[i] = "Rattata";
-                    outcome.rattata++;
-                    break;
-
-                case checkRange(spins[i], 41, 60):
-                    result[i] = "Pidgey";
-                    outcome.pidgey++;
-                    break;
-
-                case checkRange(spins[i], 61, 75):
-                    result[i] = "Golem";
-                    outcome.golem++;
-                    break;
-
-                case checkRange(spins[i], 76, 85):
-                    result[i] = "Charizard";
-                    outcome.charizard++;
-                    break;
-
-                case checkRange(spins[i], 86, 93):
-                    result[i] = "Blastoise";
-                    outcome.blastoise++;
-                    break;
-
-                case checkRange(spins[i], 94, 97):
-                    result[i] = "Mewtwo";
-                    outcome.mewtwo++;
-                    break;
-
-                case checkRange(spins[i], 98, 100):
-                    result[i] = "Mew";
-                    outcome.mew++;
-                    break;
+                outcome.blastoise++;
+            }
+            else if(result [i] === "charizard")
+            {
+                outcome.charizard++;
+            }
+            else if(result [i] === "mewtwo")
+            {
+                outcome.mewtwo++;
+            }
+            else if(result [i] === "mew")
+            {
+                outcome.mew++;
+            }
+            else if(result[i] === "pidgey")
+            {
+               outcome.pidgey++; 
+            }
+            else
+            {
+                outcome.rattata++;
             }
         }
 
         checkWinnings();
-        showResults(result);
+        showResults(spins);
         showStats();
     }
 }
@@ -123,26 +125,41 @@ function checkJackpot()
     }
 }
 
-function showResults(result)
+function showResults(spins)
 {
-    var result_str = "";
-
-    for(var i = 0; i < result.length; i++)
-    {
-        result_str += result[i];
-        if(i+1 < result.length)
-            result_str += " - ";
-    }        
-    $("#result").html(result_str);
+    var index = 0;
+    for(var i = 0; i < reels.length; i++)
+    {                
+        for(var x = spins[i]-1, count = 0; count < 3; x++, count++)
+        {            
+            if(x < 0)
+                x = reels[i].length-1;
+            else if(x > reels[i].length-1)
+                x = 0;
+            
+            reel_images[index] = new createjs.Bitmap(queue.getResult(reels[i][x]));
+            reel_images[index].regX = reel_images[index].image.width / 2;
+            reel_images[index].regY = reel_images[index].image.height / 2;
+            reel_images[index].x = reel_start_x + (i * x_offset);
+            reel_images[index].y = reel_start_y + (x * y_offset);                
+            stage.addChild(reel_images[index]);              
+            index++;
+        }
+    }   
 }
 
 function reset()
-{    
-    stage.removeChild(blastoise_img);    
+{          
     outcome.reset();
     game.reset();
     $("#result").empty();
     showStats();
+}
+
+function clearReel()
+{
+    for(var i = 0; i < reel_images.length; i++)
+        stage.removeChild(reel_images[i]);
 }
 
 function quit()
@@ -155,8 +172,6 @@ function checkRange(roll, min, max)
     return (roll >= min && roll <= max) ? roll : !roll;
 }
 
-
-
 function preload() {
     queue = new createjs.LoadQueue();
     queue.installPlugin(createjs.Sound);
@@ -164,11 +179,11 @@ function preload() {
     queue.loadManifest([        
         { id: "slot_machine", src: "images/slots.png"},
         { id: "blastoise", src: "images/blastoise.png"},
-        { id: "blastoise", src: "images/blastoise.png"},
-        { id: "blastoise", src: "images/blastoise.png"},
-        { id: "blastoise", src: "images/blastoise.png"},
-        { id: "blastoise", src: "images/blastoise.png"},
-        { id: "blastoise", src: "images/blastoise.png"},
+        { id: "charizard", src: "images/charizard.png"},
+        { id: "pidgey", src: "images/pidgey.png"},
+        { id: "mewtwo", src: "images/mewtwo.png"},
+        { id: "mew", src: "images/mew.png"},
+        { id: "rattata", src: "images/rattata.png"},
         { id: "yay", src: "sounds/yay.ogg" }
     ]);
 }
@@ -227,15 +242,7 @@ function setup()
         
     $("#spin_button").click(function(){ spin();});
     $("#reset_button").click(function(){reset();});
-    $("#quit_button").click(function(){quit();});
-    
-    blastoise_img = new createjs.Bitmap(queue.getResult('blastoise'));
-    blastoise_img.regX = blastoise_img.image.width / 2;
-    blastoise_img.regY = blastoise_img.image.height / 2;
-    blastoise_img.x = stage.canvas.width / 2;
-    blastoise_img.y = stage.canvas.height / 2;                
-    stage.addChild(blastoise_img);    
-
+    $("#quit_button").click(function(){quit();});    
     showStats();        
 }
 
@@ -250,4 +257,3 @@ function gameStart() {
     stage.addChild(slot_machine_background);
     createjs.Sound.play("yay");
 }
-//# sourceMappingURL=game.js.map
