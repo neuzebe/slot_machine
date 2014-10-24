@@ -12,6 +12,7 @@ var reels = [
 ];
 
 var reel_images = [];
+var bet_100_btn, bet_50_btn, bet_10_btn, spin_btn, exit_btn, reset_btn;
     
  var y_offset = 110;  
  var reel_start_y = 100;
@@ -83,9 +84,18 @@ function spin()
         }
 
         checkWinnings();
+        console.log(result);
         showResults(spins);
         showStats();
     }
+}
+
+function bet(amount)
+{
+    if(amount <= game.player_money)
+        $("#place_bet").val(amount);
+    else
+        alert("You don't have enough money to bet this high");
 }
 
 function checkWinnings()
@@ -184,6 +194,12 @@ function preload() {
         { id: "mewtwo", src: "images/mewtwo.png"},
         { id: "mew", src: "images/mew.png"},
         { id: "rattata", src: "images/rattata.png"},
+        { id: "bet_10", src: "images/bet10.png"},
+        { id: "bet_50", src: "images/bet50.png"},
+        { id: "bet_100", src: "images/bet100.png"},
+        { id: "spin", src: "images/spin.png"},
+        { id: "exit", src: "images/exit.png"},
+        { id: "reset", src: "images/reset.png"},
         { id: "yay", src: "sounds/yay.ogg" }
     ]);
 }
@@ -205,7 +221,7 @@ function setup()
 {
     game = {
         jackpot: 500,
-        player_money: 1000,
+        player_money: 20,
         winnings: 0,
         bet: 0,
         turn: 0,
@@ -255,5 +271,56 @@ function gameStart() {
     slot_machine_background.x = stage.canvas.width / 2;
     slot_machine_background.y = stage.canvas.height / 2;                
     stage.addChild(slot_machine_background);
+    
+    bet_10_btn = new createjs.Bitmap(queue.getResult('bet_10'));
+    bet_10_btn.regX = bet_10_btn.image.width / 2;
+    bet_10_btn.regY = bet_10_btn.image.height / 2;
+    bet_10_btn.x = 105;
+    bet_10_btn.y = stage.canvas.height - 26;                
+    stage.addChild(bet_10_btn);
+
+    bet_50_btn = new createjs.Bitmap(queue.getResult('bet_50'));
+    bet_50_btn.regX = bet_50_btn.image.width / 2;
+    bet_50_btn.regY = bet_50_btn.image.height / 2;
+    bet_50_btn.x = 300;
+    bet_50_btn.y = stage.canvas.height - 26;                 
+    stage.addChild(bet_50_btn);
+    
+    bet_100_btn = new createjs.Bitmap(queue.getResult('bet_100'));
+    bet_100_btn.regX = bet_100_btn.image.width / 2;
+    bet_100_btn.regY = bet_100_btn.image.height / 2;
+    bet_100_btn.x = 495;
+    bet_100_btn.y = stage.canvas.height - 26;                 
+    stage.addChild(bet_100_btn);
+    
+    spin_btn = new createjs.Bitmap(queue.getResult('spin'));
+    spin_btn.regX = spin_btn.image.width / 2;
+    spin_btn.regY = spin_btn.image.height / 2;
+    spin_btn.x = 690;
+    spin_btn.y = stage.canvas.height - 26;                 
+    stage.addChild(spin_btn);   
+    
+    exit_btn = new createjs.Bitmap(queue.getResult('exit'));
+    exit_btn.regX = exit_btn.image.width / 2;
+    exit_btn.regY = exit_btn.image.height / 2;
+    exit_btn.x = stage.canvas.width - 26;
+    exit_btn.y = 20;                 
+    stage.addChild(exit_btn); 
+    
+    reset_btn = new createjs.Bitmap(queue.getResult('reset'));
+    reset_btn.regX = reset_btn.image.width / 2;
+    reset_btn.regY = reset_btn.image.height / 2;
+    reset_btn.x = stage.canvas.width - 70;
+    reset_btn.y = 20;                 
+    stage.addChild(reset_btn);    
+    
+    spin_btn.on("click", function(){spin();});
+    exit_btn.on("click", function(){quit();});
+    reset_btn.on("click", function(){reset();});
+    bet_10_btn.on("click", function(){bet(10);});
+    bet_50_btn.on("click", function(){bet(50);});
+    bet_100_btn.on("click", function(){bet(100);});
+    
+    
     createjs.Sound.play("yay");
 }
