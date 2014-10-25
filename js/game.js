@@ -74,6 +74,7 @@ function spin()
         alert("You need to specify a valid bet amount");        
     else
     {
+        createjs.Sound.play("spin_wheel");
         clearReel();
         outcome.reset();
         game.winnings = 0;
@@ -124,7 +125,10 @@ function spin()
 function bet(amount)
 {
     if(amount <= game.player_money)
+    {
         game.bet = amount;
+        createjs.Sound.play("bet");
+    }
     else
         alert("You don't have enough money to bet this high");
     
@@ -135,7 +139,7 @@ function checkWinnings()
 {
     if(outcome.rattata === 0)
     {
-        console.log(outcome);
+        createjs.Sound.play("win");        
         game.wins++;
         game.winnings += game.bet;
         
@@ -173,6 +177,7 @@ function checkJackpot()
         alert("You Won the $" + game.jackpot + " Jackpot!!");
         game.player_money += game.jackpot;
         game.jackpot *= 2;
+        createjs.Sound.play("jackpot");
         showStats();
     }
 }
@@ -237,7 +242,10 @@ function preload() {
         { id: "spin", src: "images/spin.png"},
         { id: "exit", src: "images/exit.png"},
         { id: "reset", src: "images/reset.png"},
-        { id: "yay", src: "sounds/yay.ogg" }
+        { id: "spin_wheel", src: "sounds/spin.ogg" },
+        { id: "win", src: "sounds/win.ogg" },
+        { id: "bet", src: "sounds/bet.ogg" },
+        { id: "jackpot", src: "sounds/jackpot.ogg" }
     ]);
 }
 
@@ -355,6 +363,5 @@ function gameStart() {
     bet_10_btn.on("click", function(){bet(10);});
     bet_50_btn.on("click", function(){bet(50);});
     bet_100_btn.on("click", function(){bet(100);});
-
-    createjs.Sound.play("yay");
+    
 }
