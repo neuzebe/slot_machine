@@ -135,22 +135,29 @@ function checkWinnings()
 {
     if(outcome.rattata === 0)
     {
+        console.log(outcome);
         game.wins++;
         game.winnings += game.bet;
         
         if(outcome.pidgey === 3)
             game.winnings += game.bet * 10;
-
-        if(outcome.blastoise === 3 || outcome.charizard === 3)
+        else if(outcome.pidgey === 4)
+            game.winnings += game.bet * 15;
+        else if(outcome.pidgey === 5)
             game.winnings += game.bet * 20;
-
-        if(outcome.mew === 3 || outcome.mewtwo === 3)
-            game.winnings += game.bet * 30;
-
-        if(outcome.mew === 4 || outcome.mewtwo === 4)
+        else if(outcome.blastoise === 3 || outcome.charizard === 3)
+            game.winnings += game.bet * 20;
+        else if(outcome.blastoise === 4 || outcome.charizard === 4)
+            game.winnings += game.bet * 30;  
+        else if(outcome.blastoise === 5 || outcome.charizard === 5)
+            game.winnings += game.bet * 50;        
+        else if(outcome.mew === 3 || outcome.mewtwo === 3)
             game.winnings += game.bet * 40;
-
-        if(outcome.mew === 5)
+        else if(outcome.mew === 4 || outcome.mewtwo === 4)
+            game.winnings += game.bet * 60;                      
+        else if(outcome.mewtwo === 5)
+            game.winnings += game.bet * 80;
+        else if(outcome.mew === 5)
             game.winnings += game.bet * 100;
 
         game.player_money += game.winnings;
