@@ -1,3 +1,13 @@
+/* Version 1.1
+ * Added createJS GUI
+ * Noel Euzebe 300709334
+ * Last Modified By: Noel Euzebe
+ * Date Last Modified: 24th Oct 2014
+ * ---------
+ * game.js
+ * Handles logic for the slot machine. Takes user input, spins reels,
+ * and processes spin results and display.
+ */
 var stage;
 var queue;
 var game;
@@ -20,19 +30,13 @@ var display_money, display_turn, display_wins, display_bet, display_jackpot, dis
  
  var x_offset = 115;
  var reel_start_x = 170;
-    
+
+/*
+ * showStats()
+ * updates the canvas GUI with all of the player stats
+ */
 function showStats()
-{
-    $("#jackpot").html(game.jackpot);
-    $("#player_money").html(game.player_money);
-    $("#turn").html(game.turn);
-    $("#wins").html(game.wins);
-    $("#losses").html(game.turn - game.wins);
-    if(game.turn > 0)
-        $("#win_ratio").html("" + ((game.wins / game.turn) * 100) + "%" );
-    else
-        $("#win_ratio").html("0%" );
-    
+{  
     stage.removeChild(display_money);
     stage.removeChild(display_bet);
     stage.removeChild(display_wins);
@@ -66,6 +70,13 @@ function showStats()
     stage.addChild(display_jackpot);           
 }
 
+
+/*
+ * spin()
+ * main functionality exists here
+ * generates the random rolls for the reel spins,
+ * assigns roll results and calculates outcomes
+ */
 function spin()
 {        
     if(game.bet > game.player_money)        
@@ -86,9 +97,11 @@ function spin()
 
         for(var i = 0; i < 5; i++)
         {
+            //generate the random reel spin
             spins[i] = Math.floor((Math.random() * 6));                        
             result[i] = reels[i][spins[i]];   
             
+            //check to see what are the outcomes of the reel spins
             if(result[i] === "blastoise")
             {
                 outcome.blastoise++;
@@ -115,13 +128,17 @@ function spin()
             }
         }
 
-        checkWinnings();
-        console.log(result);
+        checkWinnings();        
         showResults(spins);
         showStats();
     }
 }
 
+/*
+ * bet(amount)
+ * takes a bet amount from the bet button clicked by the user
+ * verifies the user has enough credit to bet that much
+ */
 function bet(amount)
 {
     if(amount <= game.player_money)
@@ -135,14 +152,23 @@ function bet(amount)
     showStats();
 }
 
+
+/*
+ * checkWinnings()
+ * called after the reel spins to evaluate whether or not the player has won any money
+ */
 function checkWinnings()
 {
+    //if there are no rattatas in the roll, then the player at least collects his
+    //bet amount back
     if(outcome.rattata === 0)
     {
         createjs.Sound.play("win");        
         game.wins++;
         game.winnings += game.bet;
         
+        //based on the rarity and the frequency of the symbols in the roll,
+        //the player's winnings are increased
         if(outcome.pidgey === 3)
             game.winnings += game.bet * 10;
         else if(outcome.pidgey === 4)
@@ -169,6 +195,11 @@ function checkWinnings()
     }
 }
 
+/*
+ * checkJackpot()
+ * called once the player has won, gives the player a slight chance at winning the
+ * big jackpot
+ */
 function checkJackpot()
 {
     var jackPotTry = Math.floor(Math.random() * 51 + 1);
@@ -176,23 +207,34 @@ function checkJackpot()
     if (jackPotTry === jackPotWin) {
         alert("You Won the $" + game.jackpot + " Jackpot!!");
         game.player_money += game.jackpot;
+        //double the jackpot for even greater winnings in the future
         game.jackpot *= 2;
         createjs.Sound.play("jackpot");
         showStats();
     }
 }
 
+/*
+ * showResults(spins)
+ * takes the spin results and displays the corresponding symbols in the correct
+ * reels
+ */
 function showResults(spins)
 {
     var index = 0;
-    for(var i = 0; i < reels.length; i++)
+    for(var i = 0; i < reels.length; i++) //across
     {                
-        for(var x = spins[i]-1, count = 0; count < 3; x++, count++)
+        for(var x = spins[i]-1, count = 0; count < 3; x++, count++)//down
         {            
+            //effectively link the last item of the reel to the first
             if(x < 0)
                 x = reels[i].length-1;
             else if(x > reels[i].length-1)
                 x = 0;
+            
+            //based on each image's specific indices, display in correct position
+            //position calculated with x offset based on the reel and y offset based
+            //on order in its reel
             
             reel_images[index] = new createjs.Bitmap(queue.getResult(reels[i][x]));
             reel_images[index].regX = reel_images[index].image.width / 2;
@@ -205,13 +247,23 @@ function showResults(spins)
     }   
 }
 
+/*
+ * reset(0)
+ * resets the game stats
+ */
 function reset()
 {          
     outcome.reset();
     game.reset();
     $("#result").empty();
+    clearReel();
     showStats();
 }
+
+/*
+ * clearReel()
+ * removes all symbols from the reels
+ */
 
 function clearReel()
 {
@@ -219,11 +271,19 @@ function clearReel()
         stage.removeChild(reel_images[i]);
 }
 
+/*
+ * quit()
+ * quits the game, redirects to google homepage
+ */
 function quit()
 {
-   window.close();
+   window.location = "http://www.google.ca";
 }
 
+/*
+ * preload()
+ * preloads all game assets
+ */
 function preload() {
     queue = new createjs.LoadQueue();
     queue.installPlugin(createjs.Sound);
@@ -249,6 +309,10 @@ function preload() {
     ]);
 }
 
+/*
+ * init()
+ * sets up the stage and calls other initial functions
+ */
 function init() {
     stage = new createjs.Stage(document.getElementById("canvas"));
     stage.enableMouseOver(20);
@@ -262,6 +326,10 @@ function handleTick(event) {
     stage.update();
 }
 
+/*
+ * setup()
+ * sets up initial values for game data
+ */
 function setup()
 {
     game = {
@@ -305,6 +373,11 @@ function setup()
     showStats();        
 }
 
+/*
+ * gameStart()
+ * sets up the User interface, places the background inmages as well as buttons
+ * responsible for creating event handlers
+ */
 function gameStart() {
     // Add code here
     // Some example code here - to be replaced
@@ -349,7 +422,7 @@ function gameStart() {
     exit_btn.x = stage.canvas.width - 26;
     exit_btn.y = 20;                 
     stage.addChild(exit_btn); 
-    
+        
     reset_btn = new createjs.Bitmap(queue.getResult('reset'));
     reset_btn.regX = reset_btn.image.width / 2;
     reset_btn.regY = reset_btn.image.height / 2;
