@@ -13,6 +13,7 @@ var reels = [
 
 var reel_images = [];
 var bet_100_btn, bet_50_btn, bet_10_btn, spin_btn, exit_btn, reset_btn;
+var display_money, display_turn, display_wins, display_bet, display_jackpot, display_winnings;
     
  var y_offset = 110;  
  var reel_start_y = 100;
@@ -31,12 +32,42 @@ function showStats()
         $("#win_ratio").html("" + ((game.wins / game.turn) * 100) + "%" );
     else
         $("#win_ratio").html("0%" );
+    
+    stage.removeChild(display_money);
+    stage.removeChild(display_bet);
+    stage.removeChild(display_wins);
+    stage.removeChild(display_winnings);
+    stage.removeChild(display_jackpot);
+    
+    display_money = new createjs.Text("Bal: $" + game.player_money, "bold 24px Arial", "#ffffff");
+    display_money.x = 30;
+    display_money.y = stage.canvas.height - 75; 
+    
+    display_bet = new createjs.Text("Bet: $" + game.bet, "bold 24px Arial", "#ffffff");
+    display_bet.x = 255;
+    display_bet.y = stage.canvas.height - 75;
+    
+    display_wins = new createjs.Text("Wins: " + game.wins, "bold 24px Arial", "#ffffff");
+    display_wins.x = 445;
+    display_wins.y = stage.canvas.height - 75;    
+        
+    display_winnings = new createjs.Text("Won: $" + game.winnings, "bold 24px Arial", "#ffffff");
+    display_winnings.x = 620;
+    display_winnings.y = stage.canvas.height - 75;    
+    
+    display_jackpot = new createjs.Text("JACKPOT: $" + game.jackpot, "bold 32px Arial", "#ff7700");
+    display_jackpot.y = 10;
+    display_jackpot.x = 250;
+    
+    stage.addChild(display_money);
+    stage.addChild(display_bet);
+    stage.addChild(display_wins);
+    stage.addChild(display_winnings);
+    stage.addChild(display_jackpot);           
 }
 
 function spin()
-{    
-    game.bet = $("#place_bet").val();
-
+{        
     if(game.bet > game.player_money)        
         alert("You too broke for this game son!");                                
     else if(!(game.bet > 0))        
@@ -93,9 +124,11 @@ function spin()
 function bet(amount)
 {
     if(amount <= game.player_money)
-        $("#place_bet").val(amount);
+        game.bet = amount;
     else
         alert("You don't have enough money to bet this high");
+    
+    showStats();
 }
 
 function checkWinnings()
@@ -103,7 +136,8 @@ function checkWinnings()
     if(outcome.rattata === 0)
     {
         game.wins++;
-
+        game.winnings += game.bet;
+        
         if(outcome.pidgey === 3)
             game.winnings += game.bet * 10;
 
@@ -131,7 +165,8 @@ function checkJackpot()
     if (jackPotTry === jackPotWin) {
         alert("You Won the $" + game.jackpot + " Jackpot!!");
         game.player_money += game.jackpot;
-        game.jackpot = 1000;
+        game.jackpot *= 2;
+        showStats();
     }
 }
 
@@ -177,11 +212,6 @@ function quit()
    window.close();
 }
 
-function checkRange(roll, min, max)
-{        
-    return (roll >= min && roll <= max) ? roll : !roll;
-}
-
 function preload() {
     queue = new createjs.LoadQueue();
     queue.installPlugin(createjs.Sound);
@@ -208,9 +238,9 @@ function init() {
     stage = new createjs.Stage(document.getElementById("canvas"));
     stage.enableMouseOver(20);
     createjs.Ticker.setFPS(60);
-    createjs.Ticker.addEventListener("tick", handleTick);
-    setup();
+    createjs.Ticker.addEventListener("tick", handleTick);    
     gameStart();
+    setup();
 }
 
 function handleTick(event) {
@@ -221,7 +251,7 @@ function setup()
 {
     game = {
         jackpot: 500,
-        player_money: 20,
+        player_money: 1000,
         winnings: 0,
         bet: 0,
         turn: 0,
@@ -256,9 +286,7 @@ function setup()
             }
         };    
         
-    $("#spin_button").click(function(){ spin();});
-    $("#reset_button").click(function(){reset();});
-    $("#quit_button").click(function(){quit();});    
+     $("#place_bet").val(0);    
     showStats();        
 }
 
@@ -320,7 +348,6 @@ function gameStart() {
     bet_10_btn.on("click", function(){bet(10);});
     bet_50_btn.on("click", function(){bet(50);});
     bet_100_btn.on("click", function(){bet(100);});
-    
-    
+
     createjs.Sound.play("yay");
 }

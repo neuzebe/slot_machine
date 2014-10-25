@@ -8,7 +8,7 @@
     <body onload="preload()">
         
         <div id="container">
-            <div id="stats">
+            <div style="display: none" id="stats">
                 <p>
                     Jackpot: <span id="jackpot"></span><br/>
                     Player Money: <span id="player_money"></span><br/>
@@ -19,7 +19,7 @@
                 </p>
             </div>
             
-            <div id="place_bet_container">
+            <div style="display: none" id="place_bet_container">
                 Place Your Bet: <input type="text" id="place_bet" name="place_bet"/>
             </div>
             
@@ -29,11 +29,7 @@
             
             <canvas id="canvas" width="800" height="480"></canvas>
             
-            <div id="buttons_container">
-                <button id="spin_button">SPIN</button>
-                <button id="reset_button">RESET</button>
-                <button id="quit_button">QUIT</button>
-            </div>
+
         </div>        
         <script src="js/jquery-2.1.1.min.js"></script>                
         <script src="js/easeljs-0.7.1.min.js"></script>
